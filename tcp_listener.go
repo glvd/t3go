@@ -11,16 +11,25 @@ import (
 	"github.com/portmapping/go-reuse"
 )
 
+// TCPConfig ...
 type TCPConfig struct {
 	Port        int
 	Certificate []tls.Certificate
 }
 
+// TCPListener ...
 type TCPListener struct {
 	cfg    *TCPConfig
 	ctx    context.Context
 	cancel context.CancelFunc
 	pool   *ants2.PoolWithFunc
+}
+
+// Head ...
+type Head struct {
+	Type    uint8 `json:"type"`
+	Tunnel  uint8 `json:"tunnel"`
+	Version uint8 `json:"version"`
 }
 
 // NewTCPListener ...
@@ -61,15 +70,14 @@ func tcpListenHandler(i interface{}) {
 func processRun(types uint8, conn net.Conn) error {
 	switch types {
 	case RequestPing:
+		return reply(RequestPing, conn)
 	case RequestConnect:
 	}
 	return fmt.Errorf("not supported")
 }
 
-type Head struct {
-	Type    uint8 `json:"type"`
-	Tunnel  uint8 `json:"tunnel"`
-	Version uint8 `json:"version"`
+func reply(requestPing int, conn net.Conn) error {
+	panic("implements me")
 }
 
 func readHead(conn net.Conn) (*Head, error) {
@@ -89,6 +97,7 @@ func readHead(conn net.Conn) (*Head, error) {
 	return &h, nil
 }
 
+// Listen ...
 func (l *TCPListener) Listen() (err error) {
 	addr := &net.TCPAddr{
 		IP:   net.IPv4zero,
@@ -119,12 +128,14 @@ func (l *TCPListener) Listen() (err error) {
 	}
 }
 
+// Stop ...
 func (l *TCPListener) Stop() {
 	if l.cancel != nil {
 		l.cancel()
 	}
 }
 
+// NewConnector ...
 func (l *TCPListener) NewConnector(conn net.Conn) {
 	defer conn.Close()
 }

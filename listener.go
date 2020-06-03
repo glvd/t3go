@@ -1,6 +1,8 @@
 package t3go
 
 const (
-	RequestPing    = 0x01
+	// RequestPing ...
+	RequestPing = 0x01
+	// RequestConnect ...
 	RequestConnect = 0x02
 )
