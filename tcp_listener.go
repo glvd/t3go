@@ -60,8 +60,10 @@ func tcpListenHandler(i interface{}) {
 
 func processRun(types uint8, conn net.Conn) error {
 	switch types {
-	case 1:
+	case RequestPing:
+	case RequestConnect:
 	}
+	return fmt.Errorf("not supported")
 }
 
 type Head struct {
