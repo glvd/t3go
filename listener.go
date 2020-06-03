@@ -6,3 +6,9 @@ const (
 	// RequestConnect ...
 	RequestConnect = 0x02
 )
+const (
+	// ResponseFailed ...
+	ResponseFailed = 0x0
+	// ResponseSuccess ...
+	ResponseSuccess = 0x01
+)

@@ -27,9 +27,15 @@ type TCPListener struct {
 
 // Head ...
 type Head struct {
-	Type    uint8 `json:"type"`
-	Tunnel  uint8 `json:"tunnel"`
-	Version uint8 `json:"version"`
+	Type    uint8
+	Tunnel  uint8
+	Version uint8
+}
+
+// Response ...
+type Response struct {
+	Status uint8
+	Data   []byte
 }
 
 // NewTCPListener ...
@@ -70,14 +76,27 @@ func tcpListenHandler(i interface{}) {
 func processRun(types uint8, conn net.Conn) error {
 	switch types {
 	case RequestPing:
-		return reply(RequestPing, conn)
+		return reply(conn, &Response{
+			Status: ResponseSuccess,
+			Data:   []byte("PONG"),
+		})
 	case RequestConnect:
 	}
 	return fmt.Errorf("not supported")
 }
 
-func reply(requestPing int, conn net.Conn) error {
-	panic("implements me")
+func reply(conn net.Conn, resp *Response) error {
+	rlt := make([]byte, 16)
+	rlt[0] = resp.Status
+	_, err := conn.Write(rlt)
+	if err != nil {
+		return err
+	}
+	if resp.Data == nil {
+		return nil
+	}
+	_, err = conn.Write(resp.Data)
+	return err
 }
 
 func readHead(conn net.Conn) (*Head, error) {
