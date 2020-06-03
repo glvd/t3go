@@ -52,7 +52,6 @@ func (c *TCPConnector) Dial() error {
 }
 
 func readReply(conn net.Conn) (*Response, error) {
-
 	rlt := make([]byte, 16)
 	_, err := conn.Read(rlt)
 	if err != nil {
