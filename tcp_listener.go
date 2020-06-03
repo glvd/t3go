@@ -108,6 +108,10 @@ func reply(conn net.Conn, resp *Response) error {
 	return err
 }
 
+func ask(conn net.Conn) {
+
+}
+
 func readHead(conn net.Conn) (*Head, error) {
 	head := make([]byte, 16)
 	read, err := conn.Read(head)
