@@ -126,15 +126,11 @@ func reply(conn net.Conn, resp *Response) error {
 		return err
 	}
 	if resp.HasData() == ByteTrue {
-		fmt.Println("data", string(resp.Data))
 		_, err = conn.Write(resp.Data)
 	}
 	return err
 }
 
-func ask(conn net.Conn) {
-
-}
 func writeHead(conn net.Conn, head *Head) error {
 	h := make([]byte, 16)
 	h[0] = head.Type
