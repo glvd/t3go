@@ -11,6 +11,27 @@ import (
 	"github.com/portmapping/go-reuse"
 )
 
+const maxByteSize = 65520
+const (
+	// RequestPing ...
+	RequestPing = 0x01
+	// RequestConnect ...
+	RequestConnect = 0x02
+)
+const (
+	// ResponseFailed ...
+	ResponseFailed = 0x00
+	// ResponseSuccess ...
+	ResponseSuccess = 0x01
+)
+
+const (
+	// NextFalse ...
+	NextFalse = 0x00
+	// NextTrue ...
+	NextTrue = 0x01
+)
+
 // TCPConfig ...
 type TCPConfig struct {
 	Port        int
@@ -88,7 +109,7 @@ func processRun(types uint8, conn net.Conn) error {
 	case RequestPing:
 		return reply(conn, &Response{
 			Status: ResponseSuccess,
-			Data:   nil,
+			Data:   []byte("pong"),
 		})
 	case RequestConnect:
 

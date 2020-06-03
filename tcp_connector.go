@@ -2,6 +2,7 @@ package t3go
 
 import (
 	"context"
+	"fmt"
 	"github.com/portmapping/go-reuse"
 	"net"
 )
@@ -40,5 +41,32 @@ func (c *TCPConnector) Dial() error {
 	if err != nil {
 		return err
 	}
+
+	resp, err := readReply(tcp)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%+v\n", *resp)
+
 	return nil
+}
+
+func readReply(conn net.Conn) (*Response, error) {
+	rlt := make([]byte, 16)
+	resp := Response{}
+	resp.Status = rlt[0]
+	next := rlt[1]
+	_, err := conn.Read(rlt)
+	if err != nil {
+		return nil, err
+	}
+	if next == NextTrue {
+		tmp := make([]byte, maxByteSize)
+		n, err := conn.Read(tmp)
+		if err != nil {
+			return nil, err
+		}
+		resp.Data = tmp[:n]
+	}
+	return &resp, err
 }
