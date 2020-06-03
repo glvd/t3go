@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	ants2 "github.com/panjf2000/ants"
+
 	"net"
 
 	"github.com/panjf2000/ants/v2"
@@ -22,7 +22,7 @@ type TCPListener struct {
 	cfg    *TCPConfig
 	ctx    context.Context
 	cancel context.CancelFunc
-	pool   *ants2.PoolWithFunc
+	pool   *ants.PoolWithFunc
 }
 
 // Head ...
