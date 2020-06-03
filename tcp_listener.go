@@ -26,10 +26,10 @@ const (
 )
 
 const (
-	// NextFalse ...
-	NextFalse = 0x00
-	// NextTrue ...
-	NextTrue = 0x01
+	// ByteFalse ...
+	ByteFalse = 0x00
+	// ByteTrue ...
+	ByteTrue = 0x01
 )
 
 // TCPConfig ...
@@ -61,12 +61,12 @@ type Response struct {
 	Data   []byte
 }
 
-// NextData ...
-func (r Response) NextData() uint8 {
+// HasData ...
+func (r Response) HasData() uint8 {
 	if r.Data == nil {
-		return NextFalse
+		return ByteFalse
 	}
-	return NextTrue
+	return ByteTrue
 }
 
 // NewTCPListener ...
@@ -120,12 +120,13 @@ func processRun(types uint8, conn net.Conn) error {
 func reply(conn net.Conn, resp *Response) error {
 	rlt := make([]byte, 16)
 	rlt[0] = resp.Status
-	rlt[1] = resp.NextData()
+	rlt[1] = resp.HasData()
 	_, err := conn.Write(rlt)
 	if err != nil {
 		return err
 	}
-	if resp.NextData() == NextTrue {
+	if resp.HasData() == ByteTrue {
+		fmt.Println("data", string(resp.Data))
 		_, err = conn.Write(resp.Data)
 	}
 	return err
