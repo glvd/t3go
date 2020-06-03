@@ -8,7 +8,14 @@ const (
 )
 const (
 	// ResponseFailed ...
-	ResponseFailed = 0x0
+	ResponseFailed = 0x00
 	// ResponseSuccess ...
 	ResponseSuccess = 0x01
+)
+
+const (
+	// NextFalse ...
+	NextFalse = 0x00
+	// NextTrue ...
+	NextTrue = 0x01
 )

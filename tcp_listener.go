@@ -34,8 +34,9 @@ type Head struct {
 
 // Response ...
 type Response struct {
-	Status uint8
-	Data   []byte
+	Status   uint8
+	NextData uint8
+	Data     []byte
 }
 
 // NewTCPListener ...
@@ -77,10 +78,12 @@ func processRun(types uint8, conn net.Conn) error {
 	switch types {
 	case RequestPing:
 		return reply(conn, &Response{
-			Status: ResponseSuccess,
-			Data:   []byte("PONG"),
+			Status:   ResponseSuccess,
+			NextData: 0,
+			Data:     nil,
 		})
 	case RequestConnect:
+
 	}
 	return fmt.Errorf("not supported")
 }
@@ -88,6 +91,11 @@ func processRun(types uint8, conn net.Conn) error {
 func reply(conn net.Conn, resp *Response) error {
 	rlt := make([]byte, 16)
 	rlt[0] = resp.Status
+	resp.NextData = 0
+	if resp.Data != nil {
+		resp.NextData = 1
+	}
+	rlt[1] = resp.NextData
 	_, err := conn.Write(rlt)
 	if err != nil {
 		return err
