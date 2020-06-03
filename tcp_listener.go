@@ -14,6 +14,8 @@ import (
 // TCPConfig ...
 type TCPConfig struct {
 	Port        int
+	RemoteIP    net.IP
+	BindPort    int
 	Certificate []tls.Certificate
 }
 
@@ -111,7 +113,14 @@ func reply(conn net.Conn, resp *Response) error {
 func ask(conn net.Conn) {
 
 }
-
+func writeHead(conn net.Conn, head *Head) error {
+	h := make([]byte, 16)
+	h[0] = head.Type
+	h[1] = head.Tunnel
+	h[2] = head.Version
+	_, err := conn.Write(h)
+	return err
+}
 func readHead(conn net.Conn) (*Head, error) {
 	head := make([]byte, 16)
 	read, err := conn.Read(head)
