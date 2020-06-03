@@ -34,9 +34,16 @@ type Head struct {
 
 // Response ...
 type Response struct {
-	Status   uint8
-	NextData uint8
-	Data     []byte
+	Status uint8
+	Data   []byte
+}
+
+// NextData ...
+func (r Response) NextData() uint8 {
+	if r.Data == nil {
+		return NextFalse
+	}
+	return NextTrue
 }
 
 // NewTCPListener ...
@@ -78,9 +85,8 @@ func processRun(types uint8, conn net.Conn) error {
 	switch types {
 	case RequestPing:
 		return reply(conn, &Response{
-			Status:   ResponseSuccess,
-			NextData: 0,
-			Data:     nil,
+			Status: ResponseSuccess,
+			Data:   nil,
 		})
 	case RequestConnect:
 
@@ -91,19 +97,14 @@ func processRun(types uint8, conn net.Conn) error {
 func reply(conn net.Conn, resp *Response) error {
 	rlt := make([]byte, 16)
 	rlt[0] = resp.Status
-	resp.NextData = 0
-	if resp.Data != nil {
-		resp.NextData = 1
-	}
-	rlt[1] = resp.NextData
+	rlt[1] = resp.NextData()
 	_, err := conn.Write(rlt)
 	if err != nil {
 		return err
 	}
-	if resp.Data == nil {
-		return nil
+	if resp.NextData() == NextTrue {
+		_, err = conn.Write(resp.Data)
 	}
-	_, err = conn.Write(resp.Data)
 	return err
 }
 
