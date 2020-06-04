@@ -97,6 +97,7 @@ func tcpListenHandler(i interface{}) {
 			conn.Close()
 		}
 	}()
+	fmt.Println("address", conn.RemoteAddr())
 	head, err := readHead(conn)
 	if err != nil {
 		return
