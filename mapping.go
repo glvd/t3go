@@ -22,7 +22,7 @@ type MapConfig struct {
 
 type natClient struct {
 	nat      nat.NAT
-	stop     atomic.Bool
+	stop     *atomic.Bool
 	port     int
 	protocol string
 	extport  int
@@ -36,31 +36,30 @@ type MapConfigOptions func(c *MapConfig)
 func MappingOnPort(protocol string, port int, opts ...MapConfigOptions) (NAT, error) {
 	n, err := nat.DiscoverGateway()
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed discover gateway on mapping: %w", err)
 	}
 	c := defaultMapConfig()
 	for _, opt := range opts {
 		opt(c)
 	}
-	extport, err := n.AddPortMapping(protocol, port, c.Description, c.Timeout*time.Second)
-	if err != nil {
-		return nil, err
-	}
 	cli := &natClient{
+		stop:     atomic.NewBool(true),
 		cfg:      c,
 		nat:      n,
 		port:     port,
 		protocol: protocol,
-		extport:  extport,
 	}
-	return cli, nil
+	err = cli.mapping()
+	return cli, err
 }
 
 func (c *natClient) mapping() (err error) {
-	c.stop.Store(false)
+	if c.stop.Load() {
+		c.stop.Store(false)
+	}
 	c.extport, err = c.nat.AddPortMapping(c.protocol, c.port, description, c.cfg.Timeout*time.Second)
 	if err != nil {
-		return err
+		return fmt.Errorf("port mapping failed: %w", err)
 	}
 
 	go func() {
@@ -68,7 +67,7 @@ func (c *natClient) mapping() (err error) {
 		defer func() {
 			t.Stop()
 			if e := recover(); e != nil {
-				fmt.Println("panic error:", e)
+				fmt.Println("panic error on mapping:", e)
 			}
 		}()
 
