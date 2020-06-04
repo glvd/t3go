@@ -1,6 +1,7 @@
 package t3go
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,6 +13,11 @@ const description = "mapping_port"
 
 // NAT ...
 type NAT interface {
+	Port() int
+	ExtPort() int
+	Protocol() string
+	StopMapping() error
+	StartMapping() error
 }
 
 // MapConfig ...
@@ -27,6 +33,32 @@ type natClient struct {
 	protocol string
 	extport  int
 	cfg      *MapConfig
+}
+
+// Protocol ...
+func (c *natClient) Protocol() string {
+	return c.protocol
+}
+
+// Port ...
+func (c *natClient) Port() int {
+	return c.port
+}
+
+// ExtPort ...
+func (c *natClient) ExtPort() int {
+	return c.extport
+}
+
+// StopMapping ...
+func (c *natClient) StopMapping() error {
+	c.stop.Store(true)
+	return nil
+}
+
+// StartMapping ...
+func (c *natClient) StartMapping() error {
+	return c.mapping()
 }
 
 // MapConfigOptions ...
@@ -54,9 +86,10 @@ func MappingOnPort(protocol string, port int, opts ...MapConfigOptions) (NAT, er
 }
 
 func (c *natClient) mapping() (err error) {
-	if c.stop.Load() {
-		c.stop.Store(false)
+	if !c.stop.Load() {
+		return errors.New("nat was on mapping")
 	}
+	c.stop.Store(false)
 	c.extport, err = c.nat.AddPortMapping(c.protocol, c.port, description, c.cfg.Timeout*time.Second)
 	if err != nil {
 		return fmt.Errorf("port mapping failed: %w", err)
