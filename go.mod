@@ -1,4 +1,4 @@
-module bug.vlavr.com/godocng/t3go
+module bug.vlavr.com/godcong/t3go
 
 go 1.14
 
