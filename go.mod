@@ -1,4 +1,4 @@
-module bug.vlavr.com/godcong/t3go
+module git.5gnode.cn/godcong/t3go
 
 go 1.14
 
