@@ -40,7 +40,7 @@ func (c *natClient) Protocol() string {
 	return c.protocol
 }
 
-// Port ...
+// RemotePort ...
 func (c *natClient) Port() int {
 	return c.port
 }

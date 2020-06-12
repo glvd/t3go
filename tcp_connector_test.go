@@ -13,10 +13,10 @@ func TestNewTCPConnector(t *testing.T) {
 	}
 	fmt.Println("dail with port", nat.ExtPort())
 	c, err := NewTCPConnector(&TCPConfig{
-		Port:        10080,
-		RemoteIP:    net.ParseIP("127.0.0.1"),
-		BindPort:    nat.ExtPort(),
-		Certificate: nil,
+		RemotePort:    10080,
+		RemoteIP:      net.ParseIP("127.0.0.1"),
+		LocalBindPort: nat.ExtPort(),
+		Certificate:   nil,
 	})
 	if err != nil {
 		t.Fatal(err)

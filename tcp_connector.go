@@ -27,8 +27,8 @@ func NewTCPConnector(cfg *TCPConfig) (*TCPConnector, error) {
 
 // Dial ...
 func (c *TCPConnector) Dial() error {
-	local := &net.TCPAddr{IP: net.IPv4zero, Port: c.cfg.BindPort}
-	remote := &net.TCPAddr{IP: c.cfg.RemoteIP, Port: c.cfg.Port}
+	local := &net.TCPAddr{IP: c.cfg.LocalIP, Port: c.cfg.LocalBindPort}
+	remote := &net.TCPAddr{IP: c.cfg.RemoteIP, Port: c.cfg.RemotePort}
 	tcp, err := reuse.DialTCP("tcp", local, remote)
 	if err != nil {
 		return err
