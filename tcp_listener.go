@@ -36,6 +36,7 @@ const (
 type TCPConfig struct {
 	Port        int
 	RemoteIP    net.IP
+	LocalIP     net.IP
 	BindPort    int
 	Certificate []tls.Certificate
 }
@@ -160,7 +161,7 @@ func readHead(conn net.Conn) (*Head, error) {
 // Listen ...
 func (l *TCPListener) Listen() (err error) {
 	addr := &net.TCPAddr{
-		IP:   net.IPv4zero,
+		IP:   l.cfg.LocalIP,
 		Port: l.cfg.Port,
 	}
 
