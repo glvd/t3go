@@ -89,22 +89,20 @@ func NewTCPListener(cfg *TCPConfig) (*TCPListener, error) {
 	return tcp, nil
 }
 
-func receiveHandle(conn net.Conn) error {
+func receiveHandle(conn net.Conn, receive chan<- []byte) error {
 	buf := make([]byte, 1024)
 	for {
 		_, err := conn.Read(buf)
 		if err != nil {
 			return err
 		}
-		fmt.Println("read", string(buf))
+		receive <- buf
 	}
 }
 
-func sendHandle(conn net.Conn) error {
-	buf := make([]byte, 1024)
-	copy(buf, "hello world")
+func sendHandle(conn net.Conn, send <-chan []byte) error {
 	for {
-		_, err := conn.Write(buf)
+		_, err := conn.Write(<-send)
 		if err != nil {
 			return err
 		}
@@ -129,8 +127,21 @@ func tcpListenHandler(i interface{}) {
 	//	return
 	//}
 	//err = processRun(head.Type, conn)
-	go receiveHandle(conn)
-	go sendHandle(conn)
+	snd := make(chan []byte)
+	rec := make(chan []byte)
+	go receiveHandle(conn, rec)
+	go sendHandle(conn, snd)
+
+	for {
+		buf := make([]byte, 1024)
+		copy(buf, "hello world")
+		select {
+		case snd <- buf:
+		case buf1 := <-rec:
+			fmt.Println("rec", string(buf1))
+		}
+	}
+
 	time.Sleep(30 * time.Minute)
 }
 

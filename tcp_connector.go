@@ -2,6 +2,7 @@ package t3go
 
 import (
 	"context"
+	"fmt"
 	"github.com/portmapping/go-reuse"
 	"net"
 	"time"
@@ -33,9 +34,20 @@ func (c *TCPConnector) Dial() error {
 	if err != nil {
 		return err
 	}
-	go receiveHandle(tcp)
-	go sendHandle(tcp)
+	snd := make(chan []byte)
+	rec := make(chan []byte)
+	go receiveHandle(tcp, rec)
+	go sendHandle(tcp, snd)
+	for {
+		buf := make([]byte, 1024)
+		copy(buf, "hello world")
+		select {
+		case snd <- buf:
+		case buf1 := <-rec:
+			fmt.Println("rec", string(buf1))
+		}
 
+	}
 	//err = writeHead(tcp, &Head{
 	//	Type:    RequestPing,
 	//	Tunnel:  0,
