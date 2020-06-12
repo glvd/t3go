@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"time"
 
 	"net"
 
@@ -87,6 +88,29 @@ func NewTCPListener(cfg *TCPConfig) (*TCPListener, error) {
 	return tcp, nil
 }
 
+func receiveHandle(conn net.Conn) error {
+	buf := make([]byte, 1024)
+	for {
+		_, err := conn.Read(buf)
+		if err != nil {
+			return err
+		}
+		fmt.Println("read", string(buf))
+	}
+}
+
+func sendHandle(conn net.Conn) error {
+	buf := make([]byte, 1024)
+	copy(buf, "hello world")
+	for {
+		_, err := conn.Write(buf)
+		if err != nil {
+			return err
+		}
+		//time.Sleep(1 * time.Second)
+	}
+}
+
 func tcpListenHandler(i interface{}) {
 	conn, b := i.(net.Conn)
 	if !b {
@@ -99,11 +123,14 @@ func tcpListenHandler(i interface{}) {
 		}
 	}()
 	fmt.Println("address", conn.RemoteAddr())
-	head, err := readHead(conn)
-	if err != nil {
-		return
-	}
-	err = processRun(head.Type, conn)
+	//head, err := readHead(conn)
+	//if err != nil {
+	//	return
+	//}
+	//err = processRun(head.Type, conn)
+	go receiveHandle(conn)
+	go sendHandle(conn)
+	time.Sleep(30 * time.Minute)
 }
 
 func processRun(types uint8, conn net.Conn) error {
