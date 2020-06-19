@@ -36,7 +36,7 @@ func (c *TCPConnector) Dial() error {
 	}
 	snd := make(chan []byte)
 	rec := make(chan []byte)
-	go receiveHandle(tcp, rec)
+	go recvHandle(tcp, rec)
 	go sendHandle(tcp, snd)
 	for {
 		buf := make([]byte, 1024)

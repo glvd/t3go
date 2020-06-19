@@ -89,7 +89,7 @@ func NewTCPListener(cfg *TCPConfig) (*TCPListener, error) {
 	return tcp, nil
 }
 
-func receiveHandle(conn net.Conn, receive chan<- []byte) error {
+func recvHandle(conn net.Conn, receive chan<- []byte) error {
 	buf := make([]byte, 1024)
 	for {
 		_, err := conn.Read(buf)
@@ -129,7 +129,7 @@ func tcpListenHandler(i interface{}) {
 	//err = processRun(head.Type, conn)
 	snd := make(chan []byte)
 	rec := make(chan []byte)
-	go receiveHandle(conn, rec)
+	go recvHandle(conn, rec)
 	go sendHandle(conn, snd)
 
 	for {
